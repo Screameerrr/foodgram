@@ -16,7 +16,7 @@ DOMAIN = os.getenv('DOMAIN')
 
 DEBUG = bool(os.getenv('DEBUG'))
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', IP, DOMAIN]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '89.169.170.187', 'zhrigavno.zapto.org']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -25,12 +25,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # ----------------------------------------
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
-    # ----------------------------------------
     'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
     'users.apps.UsersConfig',
@@ -67,12 +65,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 2200
 
@@ -80,12 +72,13 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'django'),
-        'USER': os.getenv('POSTGRES_USER', 'django'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
         'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': os.getenv('DB_PORT', 5432),
     }
 }
+
 
 
 AUTH_PASSWORD_VALIDATORS = [
