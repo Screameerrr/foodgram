@@ -1,0 +1,49 @@
+version: '3.3'
+
+volumes:
+  staticfiles:
+  mediafiles:
+  pg_data:
+
+services:
+  db:
+    image: postgres:13.10-alpine
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -h $DB_HOST -U $POSTGRES_USER -d $POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    volumes:
+      - staticfiles:/app/static
+      - mediafiles:/app/media
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    command: cp -r /app/build/. /frontend_static/
+    volumes:
+      - staticfiles:/frontend_static
+    depends_on:
+      - backend
+
+  nginx:
+    build: ./infra
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docs/:/usr/share/nginx/html/api/docs/
+      - ../frontend/build:/usr/share/nginx/html/
+      - staticfiles:/static/
+      - mediafiles:/media/
+    depends_on:
+      - frontend
+      - backend
