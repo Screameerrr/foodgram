@@ -71,10 +71,10 @@ WSGI_APPLICATION = "foodgram_backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "django"),
-        "USER": os.getenv("POSTGRES_USER", "django"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", ""),
+        "NAME": os.getenv("POSTGRES_DB", "foodgram"),
+        "USER": os.getenv("POSTGRES_USER", "foodgram_user"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "foodgram_password"),
+        "HOST": os.getenv("DB_HOST", "db"),
         "PORT": os.getenv("DB_PORT", 5432),
     }
 }
@@ -108,11 +108,11 @@ USE_TZ = True
 
 AUTH_USER_MODEL = "users.User"
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "collected_static"
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = "/app/media/"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

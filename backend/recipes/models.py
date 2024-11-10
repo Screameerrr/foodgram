@@ -201,3 +201,22 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return f"{self.user} {self.recipe}"
+
+class Import(models.Model):
+    """Импорт CSV"""
+    csv_file = models.FileField(
+        'Файл',
+        upload_to='uploads/'
+    )
+    date_added = models.DateTimeField(
+        'Дата импорта',
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ('-id', )
+        verbose_name = 'Учет импорта CSV'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return f'{self.csv_file!r}'
