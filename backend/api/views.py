@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from djoser import views as djoser_views
@@ -15,7 +15,6 @@ from api.filters import (
     RecipeFilter
 )
 from api.paginations import FoodgramPagination
-from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (
     AvatarSerializer,
     FavoriteSerializer,
