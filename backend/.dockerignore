@@ -1,9 +1,4 @@
 venv
-env
-.git 
-db.sqlite3
-db_backup.sqlite3
-.idea
-.vscode
+.git
 .env
-.mypy_cache
+db.sqlite3

@@ -1,5 +1,5 @@
 volumes:
-  pg_data:
+  postgres_data:
   static:
   media:
 
@@ -8,9 +8,9 @@ services:
     image: postgres:13.10
     env_file: .env
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
   backend:
-    image: screamerr/foodgram_backend
+    image: ${DOCKERHUB_USERNAME}/foodgram_backend
     env_file: .env
     volumes:
       - static:/backend_static
@@ -19,15 +19,17 @@ services:
       - db
   frontend:
     env_file: .env
-    image: screamerr/foodgram_frontend
+    image: ${DOCKERHUB_USERNAME}/foodgram_frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
   gateway:
-    image: screamerr/foodgram_gateway
-    env_file: .env
+    image: ${DOCKERHUB_USERNAME}/foodgram_gateway
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - static:/staticfiles/
+      - media:/app/media
     ports:
       - 80:80
-    volumes:
-      - static:/static
-      - media:/media

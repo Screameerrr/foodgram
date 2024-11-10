@@ -1,55 +1,43 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
 from django.db import models
 
-from users.constants import (EMAIL_MAX_LENGTH, NAME_MAX_LENGTH,
-                             PASSWORD_MAX_LENGTH)
 
+class CustomUser(AbstractUser):
+    """Модель для пользователей"""
 
-class User(AbstractUser):
-    email = models.EmailField(
-        "Электронная почта", max_length=EMAIL_MAX_LENGTH, unique=True
-    )
-    username = models.CharField(
-        "Имя пользователя",
-        max_length=NAME_MAX_LENGTH,
-        unique=True,
-        validators=[RegexValidator(regex=r"^[\w.@+-]+\Z")],
-    )
-    first_name = models.CharField("Имя", max_length=NAME_MAX_LENGTH)
-    last_name = models.CharField("Фамилия", max_length=NAME_MAX_LENGTH)
-    password = models.CharField("Пароль", max_length=PASSWORD_MAX_LENGTH)
+    email = models.EmailField('почта', max_length=254, unique=True)
     avatar = models.ImageField(
-        upload_to="users/", null=True, blank=True, verbose_name="Аватар"
-    )
+        upload_to='users/images/', blank=True, null=True, default=None)
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username", "first_name", "last_name"]
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        ordering = ('username',)
+        verbose_name = 'пользователя'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return f"{self.email}: {self.first_name} {self.last_name}"
+        return self.username
 
 
 class Subscription(models.Model):
-    user = models.ForeignKey(
-        User, related_name="subscriptions", on_delete=models.CASCADE
-    )
-    subscribed_to = models.ForeignKey(
-        User,
-        related_name="subscribers",
+    """Модель для подписок"""
+
+    subscriber = models.ForeignKey(
+        CustomUser,
         on_delete=models.CASCADE,
-        verbose_name="Подписан на",
-    )
+        verbose_name='пользователь',
+        related_name='subscriber')
+    subscription = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        verbose_name='подписан на пользователя',
+        related_name='subscription')
 
     class Meta:
-        verbose_name = "Подписка"
-        verbose_name_plural = "Подписки"
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user", "subscribed_to"], name="unique_subscription"
-            )
-        ]
+        verbose_name = 'подписку'
+        verbose_name_plural = 'Подписки'
+        constraints = [models.UniqueConstraint(
+            fields=['subscriber', 'subscription'],
+            name='unique_subscriber_subscription')]

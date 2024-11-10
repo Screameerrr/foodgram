@@ -12,14 +12,11 @@ const About = ({ updateOrders, orders }) => {
     </MetaTags>
     
     <Container>
-      <h1 className={styles.title}>Привет!</h1>
+      <h1 className={styles.title}></h1>
       <div className={styles.content}>
         <div>
           <h2 className={styles.subtitle}>Что это за сайт?</h2>
           <div className={styles.text}>
-            <p className={styles.textItem}>
-              Представляю вам проект, созданный во время обучения в Яндекс Практикуме. Этот проект — часть учебного курса, но он создан полностью самостоятельно.
-            </p>
             <p className={styles.textItem}>
               Цель этого сайта — дать возможность пользователям создавать и хранить рецепты на онлайн-платформе. Кроме того, можно скачать список продуктов, необходимых для
               приготовления блюда, просмотреть рецепты друзей и добавить любимые рецепты в список избранных.
@@ -41,7 +38,7 @@ const About = ({ updateOrders, orders }) => {
               Код проекта находится тут - <a href="https://github.com/Screameerrr/foodgram" className={styles.textLink}>Github</a>
             </p>
             <p className={styles.textItem}>
-              Автор проекта: <a href="#" className={styles.textLink}>Шевчук Максим</a>
+              Автор проекта: <a href="" className={styles.textLink}>Максим Шевчук</a>
             </p>
           </div>
         </aside>

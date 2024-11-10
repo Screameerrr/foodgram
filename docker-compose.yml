@@ -1,5 +1,5 @@
 volumes:
-  pg_data:
+  postgres_data:
   static:
   media:
 
@@ -8,14 +8,13 @@ services:
     image: postgres:13.10
     env_file: .env
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
   backend:
     build: ./backend/
     env_file: .env
     volumes:
       - static:/backend_static
       - media:/app/media
-      - /home/yc-user/foodgram/data:/app/data
     depends_on:
       - db
   frontend:
@@ -25,10 +24,12 @@ services:
     volumes:
       - static:/frontend_static
   gateway:
-    build: ./nginx/
-    env_file: .env
+    build: ./gateway/
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - static:/staticfiles/
+      - media:/app/media
     ports:
       - 80:80
-    volumes:
-      - static:/static
-      - media:/media
