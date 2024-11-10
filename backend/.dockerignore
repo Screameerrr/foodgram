@@ -1,6 +1,9 @@
-# Файл .dockerignore
 venv
-.git
+env
+.git 
 db.sqlite3
+db_backup.sqlite3
 .idea
 .vscode
+.env
+.mypy_cache

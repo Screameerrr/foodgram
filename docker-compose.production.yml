@@ -5,35 +5,29 @@ volumes:
 
 services:
   db:
-    image: postgres:13
+    image: postgres:13.10
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
-
   backend:
     image: screamerr/foodgram_backend
     env_file: .env
     volumes:
-      - static:/app/static
+      - static:/backend_static
       - media:/app/media
     depends_on:
       - db
-
   frontend:
+    env_file: .env
     image: screamerr/foodgram_frontend
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - ../frontend/:/app/result_build/
-    depends_on:
-      - backend
-
+      - static:/frontend_static
   gateway:
-    image: screamerr/foodgram_nginx
+    image: screamerr/foodgram_gateway
+    env_file: .env
     ports:
-      - 8080:80
+      - 80:80
     volumes:
-      - ../frontend/build:/usr/share/nginx/html/
       - static:/static
       - media:/media
-    depends_on:
-      - frontend
-      - backend

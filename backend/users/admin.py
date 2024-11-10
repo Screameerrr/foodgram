@@ -1,33 +1,30 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group
-from rest_framework.authtoken.models import TokenProxy
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import Subscriber, User
+from recipes.models import Favorite, ShoppingCart
+from users.models import Subscription, User
+
+
+class FavoriteInline(admin.TabularInline):
+    model = Favorite
+    extra = 1
+    fk_name = "user"
+
+
+class ShoppingCartInline(admin.TabularInline):
+    model = ShoppingCart
+    extra = 1
+    fk_name = "user"
+
+
+class SubscriptionInline(admin.TabularInline):
+    model = Subscription
+    extra = 1
+    fk_name = "user"
 
 
 @admin.register(User)
-class UsersAdmin(UserAdmin):
-    """Админка для пользователя"""
-
-    list_display = (
-        'id',
-        'full_name',
-        'username',
-        'email',
-        'is_staff'
-    )
-    search_fields = (
-        'username',
-        'email'
-    )
-    search_help_text = 'Поиск по `username` и `email`'
-
-    @admin.display(description='Имя фамилия')
-    def full_name(self, obj):
-        """Получение полного имени"""
-        return obj.get_full_name()
-
-
-admin.site.register(Subscriber)
-admin.site.unregister([Group, TokenProxy])
+class UserAdmin(BaseUserAdmin):
+    list_display = ("username", "first_name", "last_name", "email")
+    search_fields = ("username", "email")
+    inlines = (SubscriptionInline, FavoriteInline, ShoppingCartInline)

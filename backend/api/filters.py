@@ -1,71 +1,41 @@
 from django.contrib.auth import get_user_model
-from django_filters.rest_framework import (
-    BooleanFilter,
-    CharFilter,
-    FilterSet,
-    ModelMultipleChoiceFilter,
-)
+from django_filters import rest_framework as filters
 
-from recipes.models import (
-    Ingredient,
-    Recipe,
-    Tag
-)
+from recipes.models import Ingredient, Recipe
 
 User = get_user_model()
 
 
-class IngredientFilter(FilterSet):
-    """Ингредиенты"""
+class RecipeFilter(filters.FilterSet):
+    """Фильтр рецептов."""
 
-    name = CharFilter(lookup_expr='istartswith')
-
-    class Meta:
-        model = Ingredient
-        fields = ('name',)
-
-
-class RecipeFilter(FilterSet):
-    """Рецепты"""
-
-    tags = ModelMultipleChoiceFilter(
-        field_name='tags__slug',
-        queryset=Tag.objects.all(),
-        to_field_name='slug',
+    is_favorited = filters.BooleanFilter(method="filter_is_favorited")
+    author = filters.ModelChoiceFilter(queryset=User.objects.all())
+    is_in_shopping_cart = filters.BooleanFilter(
+        method="filter_is_in_shopping_cart"
     )
-    is_favorited = BooleanFilter(
-        method='is_favorite_filter',
-        field_name='favorites__author',
-    )
-    is_in_shopping_cart = BooleanFilter(
-        method='is_in_shopping_cart_filter',
-        field_name='shopping_cart__author',
-    )
+    tags = filters.AllValuesMultipleFilter(field_name="tags__slug")
 
     class Meta:
         model = Recipe
-        fields = (
-            'author',
-            'tags',
-            'is_favorited',
-            'is_in_shopping_cart',
-        )
+        fields = ["author", "tags", "is_favorited", "is_in_shopping_cart"]
 
-    def is_favorite_filter(self, queryset, name, value):
-        return self.filter_from_kwargs(
-            queryset,
-            value,
-            name,
-        )
-
-    def is_in_shopping_cart_filter(self, queryset, name, value):
-        return self.filter_from_kwargs(
-            queryset,
-            value,
-            name,
-        )
-
-    def filter_from_kwargs(self, queryset, value, name):
-        if value and self.request.user.id:
-            return queryset.filter(**{name: self.request.user})
+    def filter_is_favorited(self, queryset, name, value):
+        if self.request.user.is_authenticated and value:
+            return queryset.filter(favorited_by__user=self.request.user)
         return queryset
+
+    def filter_is_in_shopping_cart(self, queryset, name, value):
+        if self.request.user.is_authenticated and value:
+            return queryset.filter(cart_users__user=self.request.user)
+        return queryset
+
+
+class IngredientFilter(filters.FilterSet):
+    """Фильтр ингредиентов."""
+
+    name = filters.CharFilter(lookup_expr="icontains")
+
+    class Meta:
+        model = Ingredient
+        fields = ["name"]

@@ -34,6 +34,7 @@ const Technologies = () => {
           </div>
         </div>
       </div>
+      
     </Container>
   </Main>
 }

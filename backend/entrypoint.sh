@@ -1,5 +1,6 @@
-echo 'Migrations...'
+#!/bin/sh
+
 python manage.py migrate
-echo 'Static...'
-python manage.py collectstatic --no-input
-gunicorn --bind 0.0.0.0:8000 foodgram.wsgi  
+python manage.py collectstatic --noinput
+cp -r /app/collected_static/. /backend_static/static/
+exec "$@"
