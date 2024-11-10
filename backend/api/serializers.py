@@ -203,7 +203,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_image(self, image_data):
         if image_data is None:
             raise serializers.ValidationError(
-                'Добавте изображение.'
+                'Добавьте изображение.'
             )
         return image_data
 

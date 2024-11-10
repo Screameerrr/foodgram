@@ -209,36 +209,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return fun_action.get(self.action, RecipeCreateSerializer)
 
     def get_queryset(self):
-        user = self.request.user
-        robj = Recipe.objects
-        if self.action in ['list', 'retrieve']:
-            robj = (
-                robj.select_related('author')
-                .prefetch_related(
-                    'recipe_ingredients__ingredient',
-                    'recipe_ingredients',
-                    'tags',
-                    Subscriber.get_prefetch_subscribers(
-                        'author__subscribers',
-                        user
-                    ),
+        user = self.request.user if self.request.user.is_authenticated else None
+        robj = Recipe.objects.select_related('author').prefetch_related(
+            'recipe_ingredients__ingredient',
+            'recipe_ingredients',
+            'tags'
+        ).all()
+
+        if user and user.is_authenticated:
+            robj = robj.annotate(
+                is_favorited=Exists(
+                    user.favorite_recipes.filter(recipe=OuterRef('pk'))
+                ),
+                is_in_shopping_cart=Exists(
+                    user.shopping_cart_recipes.filter(recipe=OuterRef('pk'))
                 )
-                .annotate(
-                    is_favorited=Exists(
-                        user.favorite_recipes.filter(
-                            recipe=OuterRef('pk')
-                        )
-                    ),
-                    is_in_shopping_cart=Exists(
-                        user.shopping_cart_recipes.filter(
-                            recipe=OuterRef('pk')
-                        )
-                    ),
-                )
-                .all()
             )
 
-        return robj.order_by('-created_at').all()
+        return robj.order_by('-created_at')
 
     @action(
         methods=['post'],

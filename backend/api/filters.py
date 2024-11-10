@@ -66,6 +66,7 @@ class RecipeFilter(FilterSet):
         )
 
     def filter_from_kwargs(self, queryset, value, name):
-        if value and self.request.user.id:
+        if value and self.request.user and self.request.user.is_authenticated:
             return queryset.filter(**{name: self.request.user})
         return queryset
+
