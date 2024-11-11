@@ -69,4 +69,3 @@ class RecipeFilter(FilterSet):
         if value and self.request.user and self.request.user.is_authenticated:
             return queryset.filter(**{name: self.request.user})
         return queryset
-
