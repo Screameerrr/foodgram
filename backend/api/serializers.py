@@ -25,8 +25,6 @@ from users.models import Subscriber
 User = get_user_model()
 
 
-
-
 class UserSerializer(serializers.ModelSerializer):
     """Пользователи"""
 

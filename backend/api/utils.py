@@ -35,7 +35,6 @@ from api.constants import (
 )
 
 
-
 def ingredients_list(recipe_list):
     ingredients = {}
     for recipe in recipe_list:

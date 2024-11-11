@@ -11,7 +11,6 @@ from shortener.constants import (
 )
 
 
-
 def generate_hash() -> str:
     """Генератор"""
 
