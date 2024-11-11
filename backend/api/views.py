@@ -1,3 +1,7 @@
+backend/api/views.py:212:5: E999 IndentationError: expected an indented block
+
+
+
 from django.db.models import Exists, OuterRef
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -43,7 +47,7 @@ User = get_user_model()
 
 
 class UserViewSet(djoser_views.UserViewSet):
-    """ÐÐ¾Ð»ÑÐ·Ð¾Ð²Ð°ÑÐµÐ»Ñ"""
+    """Пользователь"""
 
     pagination_class = FoodgramPagination
 
@@ -102,7 +106,7 @@ class UserViewSet(djoser_views.UserViewSet):
         url_name='me-avatar',
     )
     def avatar(self, request):
-        """ÐÐ²Ð°ÑÐ°Ñ"""
+        """Аватар"""
         serializer = self._change_avatar(request.data)
         return Response(serializer.data)
 
@@ -122,7 +126,7 @@ class UserViewSet(djoser_views.UserViewSet):
         url_name='subscriptions',
     )
     def subscriptions(self, request):
-        """Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð¿Ð¾Ð´Ð¿Ð¸ÑÐ¾Ðº"""
+        """Список подписок"""
         page = self.paginate_queryset(self.get_queryset())
         serializer = SubscribeSerializer(
             page, many=True,
@@ -138,7 +142,7 @@ class UserViewSet(djoser_views.UserViewSet):
         url_name='subscribe',
     )
     def subscribe(self, request, id):
-        """ÐÐ¾Ð´Ð¿Ð¸ÑÐºÐ°"""
+        """Подписка"""
         serializer = SubscribeSerializer(
             data={'author': self.get_object()},
             context={'request': request},
@@ -172,7 +176,7 @@ class UserViewSet(djoser_views.UserViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
-    """Ð¢ÐµÐ³"""
+    """Тег"""
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -180,7 +184,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    """ÐÐ½Ð³ÑÐµÐ´Ð¸ÐµÐ½Ñ"""
+    """Ингредиент"""
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
@@ -190,7 +194,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    """Ð ÐµÑÐµÐ¿Ñ"""
+    """Рецепт"""
 
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = FoodgramPagination
@@ -209,19 +213,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return fun_action.get(self.action, RecipeCreateSerializer)
 
     def get_queryset(self):
-        user = (
-            self.request.user if self.request.user.is_authenticated
-            else None
+    user = (
+        self.request.user if self.request.user.is_authenticated
+        else None
+    )
+    robj = (
+        Recipe.objects.select_related('author')
+        .prefetch_related(
+            'recipe_ingredients__ingredient',
+            'recipe_ingredients',
+            'tags'
         )
-        robj = (
-            Recipe.objects.select_related('author')
-            .prefetch_related(
-                'recipe_ingredients__ingredient',
-                'recipe_ingredients',
-                'tags'
-            )
-            .all()
-        )
+        .all()
+    )
 
         if user and user.is_authenticated:
             robj = robj.annotate(
@@ -267,7 +271,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_name='get-link',
     )
     def get_link(self, request, pk=None):
-        """ÑÑÑÐ»ÐºÐ° Ð´Ð»Ñ ÑÐµÑÐµÐ¿ÑÐ°"""
+        """ссылка для рецепта"""
         self.get_object()
         original_url = request.META.get('HTTP_REFERER')
         if original_url is None:
@@ -315,7 +319,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if file_ext != 'pdf':
             return Response(
-                {'detail': 'ÐÐµÐ´Ð¾Ð¿ÑÑÑÐ¸Ð¼ÑÐ¹ ÑÐ¾ÑÐ¼Ð°Ñ ÑÐ°Ð¹Ð»Ð°.'},
+                {'detail': 'Недопустимый формат файла.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
