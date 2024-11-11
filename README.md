@@ -82,7 +82,7 @@ docker-compose exec python manage.py createsuperuser
 
 
 
-##№ Запуск на сервере
+### Запуск на сервере
 
 1. **Настройка окружения**:
    
