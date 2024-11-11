@@ -74,7 +74,6 @@ class UserViewSet(djoser_views.UserViewSet):
                 .order_by('id')
                 .all()
             )
-
         if self.action in ('subscribe',):
             return User.objects.prefetch_related(
                 Subscriber.get_prefetch_subscribers(
@@ -82,7 +81,6 @@ class UserViewSet(djoser_views.UserViewSet):
                     user
                 ),
             ).all()
-
         return User.objects.all()
 
     @action(
@@ -155,7 +153,6 @@ class UserViewSet(djoser_views.UserViewSet):
         subscriber_deleted, _ = request.user.subscriber.filter(
             author=self.get_object()
         ).delete()
-
         if subscriber_deleted == 0:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -209,18 +206,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return fun_action.get(self.action, RecipeCreateSerializer)
 
     def get_queryset(self):
-    user = (self.request.user 
-            if self.request.user.is_authenticated else None
-        )
-    robj = (
-        Recipe.objects.select_related('author')
-        .prefetch_related(
+        user = self.request.user if (self.request.user.
+                                     is_authenticated) \
+            else None
+        robj = Recipe.objects.select_related('author').prefetch_related(
             'recipe_ingredients__ingredient',
             'recipe_ingredients',
             'tags'
-        )
-        .all()
-    )
+        ).all()
 
         if user and user.is_authenticated:
             robj = robj.annotate(
@@ -231,7 +224,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                     user.shopping_cart_recipes.filter(recipe=OuterRef('pk'))
                 )
             )
-
         return robj.order_by('-created_at')
 
     @action(
@@ -278,7 +270,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def _post_author_recipe(self, request, pk):
@@ -296,7 +287,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             author=self.request.user,
             recipe=recipe,
         ).delete()
-
         if obj_count == 0:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -311,13 +301,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         author_shopping_list = Recipe.objects.filter(
             shopping_cart__author=user)
         shopping_list = ingredients_list(author_shopping_list)
-
         if file_ext != 'pdf':
             return Response(
                 {'detail': 'Недопустимый формат файла.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         content_type = 'application/pdf'
         buffer = pdf_shopping_list(
             shopping_list,
@@ -329,5 +317,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         filename = f'{user.username}_shopping_cart.{file_ext}'
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
-
         return response
