@@ -209,13 +209,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return fun_action.get(self.action, RecipeCreateSerializer)
 
     def get_queryset(self):
-        user = self.request.user if self.request.user.is_authenticated
+    user = (
+        self.request.user if self.request.user.is_authenticated
         else None
-        robj = Recipe.objects.select_related('author').prefetch_related(
+    )
+    robj = (
+        Recipe.objects.select_related('author')
+        .prefetch_related(
             'recipe_ingredients__ingredient',
             'recipe_ingredients',
             'tags'
-        ).all()
+        )
+        .all()
+    )
 
         if user and user.is_authenticated:
             robj = robj.annotate(
