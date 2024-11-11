@@ -1,37 +1,39 @@
 from collections import namedtuple
 from io import BytesIO
 
-from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
-TITLE = 'Shopping List'
-HEADER_TEXT = 'Список покупок'
-FOOTER_TEXT = 'FoodGram @ 2024'
-FONT_FAMILY = 'Arial'
-REGISTER_FONT_URL = 'data_font/SpecialElite.ttf'
-FONT_SIZE = 12
-TEXT_CANVAS_H = 0.8
-TEXT_CANVAS = 0.5
-TEXT_COLOR = colors.whitesmoke
-BOX_COLOR = colors.black
-VALIGN = "TOP"
-ALIGN = "RIGHT"
-TOPPADDING = 10
-BOTTOMPADDING = 10
-LEFTPADDING = 100
-FONTNAME = 'Arial'
-FONTSIZE = 13
-LINEBELOW_COLOR = colors.gray
-LINEBELOW = 1
-BACKGROUND_COLOR = colors.beige
-GRID_COLOR = colors.white
-GRID = 0
-DATA_COLUMN1 = 'Ингредиенты'
-DATA_COLUMN2 = 'Количество'
+from api.constants import (
+    TITLE,
+    HEADER_TEXT,
+    FOOTER_TEXT,
+    FONT_FAMILY,
+    REGISTER_FONT_URL,
+    FONT_SIZE,
+    TEXT_CANVAS_H,
+    TEXT_CANVAS,
+    TEXT_COLOR,
+    BOX_COLOR,
+    VALIGN,
+    ALIGN,
+    TOPPADDING,
+    BOTTOMPADDING,
+    LEFTPADDING,
+    FONTNAME,
+    FONTSIZE,
+    LINEBELOW_COLOR,
+    LINEBELOW,
+    BACKGROUND_COLOR,
+    GRID_COLOR,
+    GRID,
+    DATA_COLUMN1,
+    DATA_COLUMN2,
+)
+
 
 
 def ingredients_list(recipe_list):

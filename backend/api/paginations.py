@@ -1,6 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 
-PAGE_SIZE = 6
+from .constants import PAGE_SIZE
 
 
 class FoodgramPagination(PageNumberPagination):

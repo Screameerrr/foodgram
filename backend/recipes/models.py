@@ -5,15 +5,16 @@ from django.core.validators import (
 from django.conf import settings
 from django.db import models
 
+from recipes.constants import (
+    AMOUNT_MIN,
+    AMOUNT_MAX,
+    INGREDIENT_CHAR_MAX,
+    INGREDIENT_UNIT_MAX,
+    RECIPE_CHAR_MAX,
+    TAG_CHAR_MAX,
+    MIN_TIME
+)
 from users.models import User
-
-AMOUNT_MIN = 1
-AMOUNT_MAX = 32000
-INGREDIENT_CHAR_MAX = 128
-INGREDIENT_UNIT_MAX = 64
-RECIPE_CHAR_MAX = 256
-TAG_CHAR_MAX = 32
-MIN_TIME = 1
 
 
 class AuthorModel(models.Model):

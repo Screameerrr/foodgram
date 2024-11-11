@@ -3,10 +3,13 @@ from random import choice, randint
 
 from django.db import models
 
-MIN = 8
-MAX = 10
-MAX_HASH = 15
-URL = 256
+from shortener.constants import (
+    MIN,
+    MAX,
+    MAX_HASH,
+    URL
+)
+
 
 
 def generate_hash() -> str:

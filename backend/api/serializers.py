@@ -5,6 +5,12 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 from rest_framework.validators import UniqueTogetherValidator
 
+from api.constants import (
+    COOKING_TIME_MAX,
+    COOKING_TIME_MIN,
+    AMOUNT_MAX,
+    AMOUNT_MIN
+)
 from recipes.models import (
     FavoriteRecipe,
     Ingredient,
@@ -15,12 +21,10 @@ from recipes.models import (
 )
 from shortener.models import LinkMapped
 from users.models import Subscriber
+
 User = get_user_model()
 
-COOKING_TIME_MAX = 32_000
-COOKING_TIME_MIN = 1
-AMOUNT_MAX = 32_000
-AMOUNT_MIN = 1
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -314,7 +318,7 @@ class FavoriteSerializer(AuthorRecipeSerializer):
 class ShoppingCartSerializer(AuthorRecipeSerializer):
     """Корзина"""
 
-    add_recipe = 'корзину'
+    add_recipe = 'D корзину'
 
     class Meta(AuthorRecipeSerializer.Meta):
         model = ShoppingCart

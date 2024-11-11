@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
 
+from .constants import INGREDIENT_MIN_AMOUNT
 from .forms import ImportForm
 from .models import (
     FavoriteRecipe,
@@ -17,8 +18,6 @@ from .models import (
     ShoppingCart,
     Tag,
 )
-
-INGREDIENT_MIN_AMOUNT = 1
 
 
 class RecipeIngredientInline(admin.TabularInline):
