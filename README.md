@@ -1,5 +1,7 @@
 # Foodgram
 
+[![GitHub Actions Status](https://github.com/Screameerrr/foodgram/actions/workflows/main.yml/badge.svg)](https://github.com/Screameerrr/foodgram/actions)
+
 Foodgram — это онлайн-сервис для публикации рецептов, планирования покупок и обмена идеями по приготовлению блюд. Авторизованные пользователи могут публиковать свои рецепты, добавлять чужие рецепты в избранное, подписываться на других пользователей и скачивать список покупок с ингредиентами для выбранных блюд.
 
 ## Возможности проекта
@@ -34,7 +36,7 @@ git clone https://github.com/Screameerrr/foodgram.git
 cd foodgram
 ```
 
-2. Настройте Docker:
+2. **Настройте Docker**:
    
  ```
 sudo apt update
@@ -44,7 +46,7 @@ sudo sh ./get-docker.sh
 sudo apt-get install docker-compose-plugin
 ```
 
-3. Создайте файл .env и укажите переменные окружения по примеру .env.example:
+3. **Создайте файл .env и укажите переменные окружения по примеру .env.example**:
    
  ```
 POSTGRES_DB=foodgram
@@ -54,46 +56,46 @@ DB_NAME=foodgram
 DB_HOST=db
 DB_PORT=5432
 DEBUG=True
-ALLOWED_HOSTS=127.0.0.1,localhost
+ALLOWED_HOSTS=127.0.0.1,localhost,your_IP, Your_domain_name
 ```
 
-4.Запустите проект с помощью Docker Compose:
+4.**Запустите проект с помощью Docker Compose**:
 
 ```
 docker-compose up --build
 ```
 
-5. Выполните миграции базы данных и соберите статику:
+5. **Выполните миграции базы данных и соберите статику**:
 
 ```
 docker-compose exec python manage.py migrate
 docker-compose exec python manage.py collectstatic --noinput
 ```
 
-6. Создайте суперпользователя:
+6. **Создайте суперпользователя**:
 
 ```
-docker-compose exec web python manage.py createsuperuser
+docker-compose exec python manage.py createsuperuser
 ```
 
-7. Проект будет доступен по адресу: http://localhost
+7. **Проект будет доступен по адресу**: http://localhost
 
 
 
-##Запуск на сервере
+##№ Запуск на сервере
 
-1. Настройка окружения:
+1. **Настройка окружения**:
    
 - Настройте переменные в файле .env и используйте docker-compose.production.yml.
 
-2. Установите и настройте Nginx:
+2. **Установите и настройте Nginx**:
 
 ```
 sudo apt install nginx -y
 sudo systemctl start nginx
 ```
 
-3. Настройте файервол и разрешите доступ:
+3. **Настройте файервол и разрешите доступ**:
 
 ```
 sudo ufw allow 'Nginx Full'
@@ -101,7 +103,7 @@ sudo ufw allow OpenSSH
 sudo ufw enable
 ```
 
-4.  Настройка Nginx: Откройте файл конфигурации Nginx и измените настройки:
+4.  **Настройка Nginx: Откройте файл конфигурации Nginx и измените настройки**:
 
 ```
 server {
@@ -114,7 +116,7 @@ server {
     }
 }
 ```
-Проверьте корректность настроек:
+- **Проверьте корректность настроек**:
 
 ```
 sudo nginx -t
@@ -122,14 +124,14 @@ sudo systemctl restart nginx
 ```
 
 
-5.  Загрузите образы из DockerHub и запустите контейнеры:
+5.  **Загрузите образы из DockerHub и запустите контейнеры**:
 
 ```
 sudo docker compose -f docker-compose.production.yml pull
 sudo docker compose -f docker-compose.production.yml up -d
 ```
 
-6.  Выполните миграции, соберите статику и загрузите данные:
+6.  **Выполните миграции, соберите статику и загрузите данные**:
 
 ```
 sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
@@ -143,7 +145,7 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 
 # API Actions
 
-В проекте Foodgram реализованы следующие действия (ACTION) для работы с API:
+**В проекте Foodgram реализованы следующие действия (ACTION) для работы с API**:
 
 ## Пользователи
 
@@ -200,4 +202,4 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 
 
 
-Автор проекта: Максим Шевчук
+**Автор проекта**: Максим Шевчук
