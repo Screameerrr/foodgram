@@ -21,7 +21,7 @@ from .models import (
 
 
 class RecipeIngredientInline(admin.TabularInline):
-    """Ингредиент в Рецепте"""
+    """Ингредиент в рецепте."""
 
     model = RecipeIngredient
     extra = 1
@@ -29,7 +29,7 @@ class RecipeIngredientInline(admin.TabularInline):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    """Рецепт"""
+    """Рецепт."""
 
     list_display = (
         'name',
@@ -65,12 +65,12 @@ class RecipeAdmin(admin.ModelAdmin):
     )
 
     def favorite_recipe(self, obj):
-        """Избраное"""
+        """Избраное."""
         return FavoriteRecipe.objects.filter(recipe=obj).count()
 
 
 class TagAdmin(admin.ModelAdmin):
-    """Тег"""
+    """Тег."""
 
     list_display = (
         'id',
@@ -85,7 +85,7 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    """Ингредиент"""
+    """Ингредиент."""
 
     list_display = (
         'name',
@@ -140,7 +140,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(FavoriteRecipe, ShoppingCart)
 class AuthorRecipeAdmin(admin.ModelAdmin):
-    """Корзина"""
+    """Корзина."""
 
     list_display = (
         'id',

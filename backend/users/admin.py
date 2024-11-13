@@ -8,7 +8,7 @@ from .models import Subscriber, User
 
 @admin.register(User)
 class UsersAdmin(UserAdmin):
-    """Админка для пользователя"""
+    """Админка для пользователя."""
 
     list_display = (
         'id',

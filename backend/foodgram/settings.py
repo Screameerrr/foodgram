@@ -10,11 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
+CSV_FILES_DIR = os.path.join(BASE_DIR, 'recipes', 'data')
+
 IP = os.getenv('IP')
 
 DOMAIN = os.getenv('DOMAIN')
 
 DEBUG = bool(os.getenv('DEBUG'))
+# DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '89.169.170.187', 'zhrigavno.zapto.org']
 
@@ -45,6 +48,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'foodgram.urls'
 
 TEMPLATES = [
@@ -67,6 +71,13 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 2200
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 DATABASES = {
     'default': {
@@ -115,9 +126,10 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
 }
 
@@ -129,8 +141,8 @@ DJOSER = {
         'current_user': 'api.serializers.UserSerializer',
     },
     'PERMISSIONS': {
-        'user_list': ('rest_framework.permissions.AllowAny',),
-        'user': ('rest_framework.permissions.IsAuthenticatedOrReadOnly',),
-        'me': ('djoser.permissions.CurrentUserOrAdmin',),
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+        'me': ['rest_framework.permissions.IsAuthenticated'],
     },
 }

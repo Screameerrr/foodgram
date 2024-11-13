@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
-    """Пользователь"""
+    """Пользователь."""
 
     email = models.EmailField(unique=True)
     first_name = models.CharField(
@@ -27,7 +27,7 @@ class User(AbstractUser):
 
 
 class AuthorModel(models.Model):
-    """Автор"""
+    """Автор."""
 
     author = models.ForeignKey(
         User,
@@ -40,7 +40,7 @@ class AuthorModel(models.Model):
 
 
 class Subscriber(AuthorModel):
-    """Подписки"""
+    """Подписки."""
 
     user = models.ForeignKey(
         User,

@@ -16,7 +16,7 @@ User = get_user_model()
 
 
 class IngredientFilter(FilterSet):
-    """Ингредиенты"""
+    """Ингредиенты."""
 
     name = CharFilter(lookup_expr='istartswith')
 
@@ -26,7 +26,7 @@ class IngredientFilter(FilterSet):
 
 
 class RecipeFilter(FilterSet):
-    """Рецепты"""
+    """Рецепты."""
 
     tags = ModelMultipleChoiceFilter(
         field_name='tags__slug',

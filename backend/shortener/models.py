@@ -12,7 +12,7 @@ from shortener.constants import (
 
 
 def generate_hash() -> str:
-    """Генератор"""
+    """Генератор."""
 
     return ''.join(
         choice(string.ascii_letters + string.digits)
@@ -21,7 +21,7 @@ def generate_hash() -> str:
 
 
 class LinkMapped(models.Model):
-    """Ссылки"""
+    """Ссылки."""
 
     url_hash = models.CharField(
         'Короткая ссылка',
@@ -29,9 +29,10 @@ class LinkMapped(models.Model):
         default=generate_hash,
         unique=True
     )
-    original_url = models.CharField(
+    original_url = models.URLField(
         'Оригинальная ссылка',
-        max_length=URL)
+        max_length=URL
+    )
 
     class Meta:
         verbose_name = 'Ссылка'

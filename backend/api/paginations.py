@@ -4,7 +4,7 @@ from .constants import PAGE_SIZE
 
 
 class FoodgramPagination(PageNumberPagination):
-    """Пагинация"""
+    """Пагинация."""
 
     page_size = PAGE_SIZE
     page_size_query_param = 'limit'

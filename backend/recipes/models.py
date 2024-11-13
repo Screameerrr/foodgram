@@ -18,7 +18,7 @@ from users.models import User
 
 
 class AuthorModel(models.Model):
-    """Автор"""
+    """Автор."""
 
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -35,7 +35,7 @@ class AuthorModel(models.Model):
 
 
 class Tag(models.Model):
-    """Теги"""
+    """Теги."""
 
     name = models.CharField(
         'Название',
@@ -58,7 +58,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Ингредиенты"""
+    """Ингредиенты."""
 
     name = models.CharField(
         'Название',
@@ -86,7 +86,7 @@ class Ingredient(models.Model):
 
 
 class Recipe(AuthorModel):
-    """Рецепты"""
+    """Рецепты."""
 
     image = models.ImageField(
         'Картинка',
@@ -130,7 +130,7 @@ class Recipe(AuthorModel):
 
 
 class RecipeIngredient(models.Model):
-    """Ингредиенты - количество"""
+    """Ингредиенты и количество."""
 
     ingredient = models.ForeignKey(
         Ingredient,
@@ -166,7 +166,7 @@ class RecipeIngredient(models.Model):
 
 
 class AuthorRecipeModel(AuthorModel):
-    """Абстрактная модель Автора и Рецепта"""
+    """Абстрактная модель автора и рецепта."""
 
     recipe = models.ForeignKey(
         'recipes.Recipe',
@@ -179,7 +179,7 @@ class AuthorRecipeModel(AuthorModel):
 
 
 class FavoriteRecipe(AuthorRecipeModel):
-    """Избранное"""
+    """Избранное."""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -206,7 +206,7 @@ class FavoriteRecipe(AuthorRecipeModel):
 
 
 class ShoppingCart(AuthorRecipeModel):
-    """Корзина"""
+    """Корзина."""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -234,7 +234,7 @@ class ShoppingCart(AuthorRecipeModel):
 
 
 class Import(models.Model):
-    """Импорт CSV"""
+    """Импорт CSV."""
     csv_file = models.FileField(
         'Файл',
         upload_to='uploads/'
