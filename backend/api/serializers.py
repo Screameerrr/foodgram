@@ -127,6 +127,8 @@ class IngredientGetSerializer(serializers.ModelSerializer):
 class ShortRecipeSerializer(serializers.ModelSerializer):
     """Сериализатор для краткого отображения рецепта."""
 
+    image = serializers.ImageField(read_only=True)
+
     class Meta:
         model = Recipe
         fields = (
@@ -239,6 +241,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Обновляет существующий рецепт."""
+        image = validated_data.get('image', instance.image)
+        if not image:
+            raise serializers.ValidationError({'image': 'Изображение рецепта обязательно для заполнения.'})
+
         tags = validated_data.pop('tags', None)
         ingredients = validated_data.pop('recipe_ingredients', None)
         if tags is not None:
@@ -246,8 +252,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if ingredients is not None:
             instance.ingredients.clear()
             self._add_ingredients(instance, ingredients)
-        super().update(instance, validated_data)
-        return instance
+        return super().update(instance, validated_data)
 
     def _add_ingredients(self, recipe, ingredients):
         """Вспомогательный метод для добавления ингредиентов к рецепту."""
@@ -263,6 +268,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Возвращает представление рецепта после создания или обновления."""
         return RecipeSerializer(instance, context=self.context).data
+
+    def validate_image(self, value):
+        """Валидирует поле image."""
+        if not value:
+            raise serializers.ValidationError('Изображение рецепта обязательно для заполнения.')
+        return value
 
 
 class AuthorRecipeSerializer(serializers.ModelSerializer):
@@ -351,10 +362,12 @@ class UserRecipeSerializer(UserSerializer):
 class ShortLinkSerializer(serializers.ModelSerializer):
     """Сериализатор для создания короткой ссылки."""
 
+    short_link = serializers.SerializerMethodField()
+
     class Meta:
         model = LinkMapped
-        fields = ('original_url',)
-        write_only_fields = ('original_url',)
+        fields = ('original_url', 'short_link')
+        extra_kwargs = {'original_url': {'write_only': True}}
 
     def get_short_link(self, obj):
         """Генерирует короткую ссылку на основе хэша."""
