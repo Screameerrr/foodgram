@@ -16,7 +16,7 @@ User = get_user_model()
 
 
 class IngredientFilter(FilterSet):
-    """Ингредиенты."""
+    """Filter for ingredients."""
 
     name = CharFilter(lookup_expr='istartswith')
 
@@ -26,7 +26,7 @@ class IngredientFilter(FilterSet):
 
 
 class RecipeFilter(FilterSet):
-    """Рецепты."""
+    """Filter for recipes."""
 
     tags = ModelMultipleChoiceFilter(
         field_name='tags__slug',
@@ -34,12 +34,10 @@ class RecipeFilter(FilterSet):
         to_field_name='slug',
     )
     is_favorited = BooleanFilter(
-        method='is_favorite_filter',
-        field_name='favorites__author',
+        method='filter_is_favorited',
     )
     is_in_shopping_cart = BooleanFilter(
-        method='is_in_shopping_cart_filter',
-        field_name='shopping_cart__author',
+        method='filter_is_in_shopping_cart',
     )
 
     class Meta:
@@ -51,21 +49,18 @@ class RecipeFilter(FilterSet):
             'is_in_shopping_cart',
         )
 
-    def is_favorite_filter(self, queryset, name, value):
-        return self.filter_from_kwargs(
-            queryset,
-            value,
-            name,
-        )
+    def filter_is_favorited(self, queryset, name, value):
+        user = self.request.user
+        if not user.is_authenticated:
+            return queryset.none()
+        if value:
+            return queryset.filter(favorites__author=user)
+        return queryset.exclude(favorites__author=user)
 
-    def is_in_shopping_cart_filter(self, queryset, name, value):
-        return self.filter_from_kwargs(
-            queryset,
-            value,
-            name,
-        )
-
-    def filter_from_kwargs(self, queryset, value, name):
-        if value and self.request.user and self.request.user.is_authenticated:
-            return queryset.filter(**{name: self.request.user})
-        return queryset
+    def filter_is_in_shopping_cart(self, queryset, name, value):
+        user = self.request.user
+        if not user.is_authenticated:
+            return queryset.none()
+        if value:
+            return queryset.filter(shopping_cart__author=user)
+        return queryset.exclude(shopping_cart__author=user)
