@@ -10,11 +10,13 @@ from djoser import views as djoser_views
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.paginations import FoodgramPagination
+from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (
     AvatarSerializer,
     IngredientSerializer,
     RecipeCreateSerializer,
     RecipeSerializer,
+    ShortLinkSerializer,
     SubscribeSerializer,
     TagSerializer,
 )
@@ -172,21 +174,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для управления рецептами."""
 
     queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
     pagination_class = FoodgramPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
-
-    def get_permissions(self):
-        """Получение разрешений для действий."""
-        if self.action in ['list', 'retrieve']:
-            return [permissions.AllowAny()]
-        return [IsAuthenticated()]
+    permission_classes = [IsOwnerOrReadOnly]
+    # def get_permissions(self):
+    #     """Получение разрешений для действий."""
+    #     if self.action in ['list', 'retrieve']:
+    #         return [permissions.AllowAny()]
+    #     return [IsAuthenticated()]
 
     def get_serializer_class(self):
         """Получение сериализатора в зависимости от действия."""
         if self.action in ['list', 'retrieve']:
             return RecipeSerializer
-        return RecipeCreateSerializer
+        elif self.action in ['create', 'update', 'partial_update']:
+            return RecipeCreateSerializer
+        return RecipeSerializer
 
     def perform_create(self, serializer):
         """Сохранение автора при создании рецепта."""
@@ -281,3 +286,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'attachment; filename="shopping_list.pdf"'
         )
         return response
+
+    @action(
+        methods=['get'],
+        detail=True,
+        permission_classes=[permissions.AllowAny],
+        url_path='get-link',
+    )
+    def get_link(self, request, pk=None):
+        """Получение короткой ссылки на рецепт."""
+        recipe = self.get_object()
+        original_url = request.build_absolute_uri(f'/api/recipes/{recipe.id}/')
+        serializer = ShortLinkSerializer(
+            data={'original_url': original_url},
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
