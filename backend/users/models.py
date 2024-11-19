@@ -1,8 +1,7 @@
 from django.contrib.auth.models import AbstractUser
-
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from users.constants import MAX_LENGTH_FIRST_NAME, MAX_LENGTH_LAST_NAME
 
 class User(AbstractUser):
     """Пользователь."""
@@ -10,11 +9,11 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(
         _("first name"),
-        max_length=150
+        max_length=MAX_LENGTH_FIRST_NAME
     )
     last_name = models.CharField(
         _("last name"),
-        max_length=150
+        max_length=MAX_LENGTH_LAST_NAME
     )
     avatar = models.ImageField(
         'Аватар',
@@ -25,27 +24,28 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
 
-
-class AuthorModel(models.Model):
-    """Автор."""
-
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='Автор',
-    )
-
     class Meta:
-        abstract = True
+        ordering = ['id']
 
 
-class Subscriber(AuthorModel):
+
+
+class Subscriber(models.Model):
     """Подписки."""
 
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='subscriber'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscribers'
+    )
+    created_at = models.DateTimeField(
+        'Дата подписки',
+        auto_now_add=True
     )
 
     class Meta:

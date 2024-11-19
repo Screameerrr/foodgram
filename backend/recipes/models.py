@@ -1,8 +1,5 @@
-from django.core.validators import (
-    MinValueValidator,
-    MaxValueValidator
-)
-from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from recipes.constants import (
@@ -12,26 +9,31 @@ from recipes.constants import (
     INGREDIENT_UNIT_MAX,
     RECIPE_CHAR_MAX,
     TAG_CHAR_MAX,
-    MIN_TIME
+    MIN_TIME,
 )
-from users.models import User
+
+User = get_user_model()
 
 
 class AuthorModel(models.Model):
     """Автор."""
 
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
     )
+    created_at = models.DateTimeField(
+        'Создано',
+        auto_now_add=True,
+    )
 
     class Meta:
-        ordering = ('-id', )
+        ordering = ('-created_at',)
         abstract = True
 
     def __str__(self):
-        return self.author
+        return str(self.author)
 
 
 class Tag(models.Model):
@@ -40,16 +42,16 @@ class Tag(models.Model):
     name = models.CharField(
         'Название',
         max_length=TAG_CHAR_MAX,
-        unique=True
+        unique=True,
     )
     slug = models.SlugField(
         'Слаг',
         max_length=TAG_CHAR_MAX,
-        unique=True
+        unique=True,
     )
 
     class Meta:
-        ordering = ('-id', )
+        ordering = ('name',)
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
@@ -63,11 +65,11 @@ class Ingredient(models.Model):
     name = models.CharField(
         'Название',
         max_length=INGREDIENT_CHAR_MAX,
-        db_index=True
+        db_index=True,
     )
     measurement_unit = models.CharField(
         'Единицы измерения',
-        max_length=INGREDIENT_UNIT_MAX
+        max_length=INGREDIENT_UNIT_MAX,
     )
 
     class Meta:
@@ -90,37 +92,37 @@ class Recipe(AuthorModel):
 
     image = models.ImageField(
         'Картинка',
-        upload_to='recipes/'
+        upload_to='recipes/',
     )
     name = models.CharField(
         'Название',
-        max_length=RECIPE_CHAR_MAX
+        max_length=RECIPE_CHAR_MAX,
     )
     text = models.TextField(
-        'Описание'
+        'Описание',
     )
     created_at = models.DateTimeField(
         'Создано',
-        auto_now_add=True
+        auto_now_add=True,
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Теги'
+        verbose_name='Теги',
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингредиенты',
-        through='RecipeIngredient'
+        through='RecipeIngredient',
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления',
         validators=[
-            MinValueValidator(MIN_TIME,),
+            MinValueValidator(MIN_TIME),
         ],
     )
 
     class Meta:
-        ordering = ('-created_at',)
+        ordering = ('-id',)
         default_related_name = 'recipes'
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
@@ -135,27 +137,28 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        verbose_name='Ингредиент'
+        verbose_name='Ингредиент',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+        verbose_name='Рецепт',
     )
     amount = models.PositiveSmallIntegerField(
         'Количество',
         validators=[
-            MinValueValidator(AMOUNT_MIN,),
-            MaxValueValidator(AMOUNT_MAX,),
+            MinValueValidator(AMOUNT_MIN),
+            MaxValueValidator(AMOUNT_MAX),
         ],
     )
 
     class Meta:
-        ordering = ('-id', )
+        ordering = ('-id',)
         default_related_name = 'recipe_ingredients'
         constraints = [
             models.UniqueConstraint(
                 fields=['ingredient', 'recipe'],
-                name='unique ingredient'
+                name='unique ingredient',
             )
         ]
         verbose_name = 'Ингредиент'
@@ -171,33 +174,25 @@ class AuthorRecipeModel(AuthorModel):
     recipe = models.ForeignKey(
         'recipes.Recipe',
         on_delete=models.CASCADE,
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
 
-    class Meta:
+    class Meta(AuthorModel.Meta):
         abstract = True
 
 
 class FavoriteRecipe(AuthorRecipeModel):
     """Избранное."""
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='favorite_recipes'
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE
-    )
 
-    class Meta:
+    class Meta(AuthorRecipeModel.Meta):
         default_related_name = 'favorites'
+        ordering = ('-id',)
         verbose_name = 'Избранное'
         verbose_name_plural = verbose_name
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'recipe'],
-                name='unique recipe favorite'
+                name='unique recipe favorite',
             )
         ]
 
@@ -207,25 +202,16 @@ class FavoriteRecipe(AuthorRecipeModel):
 
 class ShoppingCart(AuthorRecipeModel):
     """Корзина."""
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='shopping_cart_recipes'
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE
-    )
 
-    class Meta:
-        ordering = ('-id', )
+    class Meta(AuthorRecipeModel.Meta):
+        ordering = ('-id',)
         default_related_name = 'shopping_cart'
         verbose_name = 'Корзина'
         verbose_name_plural = verbose_name
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'recipe'],
-                name='unique recipe shopping cart'
+                name='unique recipe shopping cart',
             )
         ]
 
@@ -235,17 +221,18 @@ class ShoppingCart(AuthorRecipeModel):
 
 class Import(models.Model):
     """Импорт CSV."""
+
     csv_file = models.FileField(
         'Файл',
-        upload_to='uploads/'
+        upload_to='uploads/',
     )
     date_added = models.DateTimeField(
         'Дата импорта',
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     class Meta:
-        ordering = ('-id', )
+        ordering = ('-id',)
         verbose_name = 'Учет импорта CSV'
         verbose_name_plural = verbose_name
 

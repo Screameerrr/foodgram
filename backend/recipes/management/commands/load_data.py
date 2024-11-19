@@ -3,9 +3,12 @@ import os
 from csv import reader
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
+from tqdm import tqdm
 
-from foodgram.settings import CSV_FILES_DIR
 from recipes.models import Ingredient, Tag
+
+CSV_FILES_DIR = settings.CSV_FILES_DIR
 
 logging.basicConfig(
     format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s',
@@ -17,32 +20,26 @@ def load(csv_file, model, *fields):
     """Загружает данные из CSV-файла в указанную модель."""
 
     if model.objects.exists():
-        logging.info(
-            f'В таблице {model._meta.db_table} уже есть данные.'
-        )
+        logging.info(f'В таблице {model._meta.db_table} уже есть данные.')
         return
-
     file_path = os.path.join(CSV_FILES_DIR, csv_file)
     if not os.path.exists(file_path):
-        logging.error(
-            f'Файл {csv_file} не найден в директории {CSV_FILES_DIR}.'
-        )
+        logging.error(f'Файл {csv_file} не найден в директории'
+                      f' {CSV_FILES_DIR}.'
+                      )
         return
-
     with open(file_path, encoding='utf-8') as rows:
-        logging.info(
-            f'Начинаю загрузку {csv_file} в {model._meta.db_table}'
-        )
+        logging.info(f'Начинаю загрузку {csv_file} в {model._meta.db_table}')
         try:
-            for row in reader(rows):
-                model.objects.create(**dict(zip(fields, row)))
-            logging.info(
-                f'Данные из {csv_file} успешно загружены.'
-            )
+            objects_to_create = []
+            for row in tqdm(reader(rows), desc=f'Загрузка {csv_file}'):
+                objects_to_create.append(model(**dict(zip(fields, row))))
+            model.objects.bulk_create(objects_to_create)
+            logging.info(f'Данные из {csv_file} успешно загружены.')
         except Exception as error:
-            logging.error(
-                f'Ошибка {error}! Проверьте строку {row} в файле {csv_file}'
-            )
+            logging.error(f'Ошибка {error}! '
+                          f'Проверьте строку {row} в файле {csv_file}'
+                          )
 
 
 class Command(BaseCommand):

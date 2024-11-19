@@ -3,20 +3,19 @@ from django_filters.rest_framework import (
     BooleanFilter,
     CharFilter,
     FilterSet,
-    ModelMultipleChoiceFilter,
+    AllValuesMultipleFilter,
 )
 
 from recipes.models import (
     Ingredient,
     Recipe,
-    Tag
 )
 
 User = get_user_model()
 
 
 class IngredientFilter(FilterSet):
-    """Filter for ingredients."""
+    """Фильтр для ингредиентов."""
 
     name = CharFilter(lookup_expr='istartswith')
 
@@ -26,19 +25,12 @@ class IngredientFilter(FilterSet):
 
 
 class RecipeFilter(FilterSet):
-    """Filter for recipes."""
+    """Фильтр для рецептов."""
 
-    tags = ModelMultipleChoiceFilter(
-        field_name='tags__slug',
-        queryset=Tag.objects.all(),
-        to_field_name='slug',
-    )
-    is_favorited = BooleanFilter(
-        method='filter_is_favorited',
-    )
+    tags = AllValuesMultipleFilter(field_name='tags__slug')
+    is_favorited = BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = BooleanFilter(
-        method='filter_is_in_shopping_cart',
-    )
+        method='filter_is_in_shopping_cart')
 
     class Meta:
         model = Recipe

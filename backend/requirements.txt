@@ -11,3 +11,4 @@ uharfbuzz==0.39.1
 drf_extra_fields==3.7.0
 reportlab
 flake8
+tqdm

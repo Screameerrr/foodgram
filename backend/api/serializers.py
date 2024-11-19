@@ -46,7 +46,9 @@ class UserSerializer(serializers.ModelSerializer):
         """Проверяет, подписан ли текущий пользователь на данного автора."""
         current_user = self.context['request'].user
         if current_user.is_authenticated and current_user != obj:
-            return Subscriber.objects.filter(user=current_user, author=obj).exists()
+            return Subscriber.objects.filter(
+                user=current_user,
+                author=obj).exists()
         return False
 
 
@@ -170,13 +172,17 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return FavoriteRecipe.objects.filter(author=user, recipe=obj).exists()
+            return FavoriteRecipe.objects.filter(
+                author=user,
+                recipe=obj).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
         if user.is_authenticated:
-            return ShoppingCart.objects.filter(author=user, recipe=obj).exists()
+            return ShoppingCart.objects.filter(
+                author=user,
+                recipe=obj).exists()
         return False
 
 
@@ -210,40 +216,58 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Проверяет корректность введённых данных при создании рецепта."""
-        tags = data.get('tags', [])
+        tags = data.get('tags')
         if not tags:
-            raise serializers.ValidationError({'tags': 'Добавьте хотя бы один тег.'})
+            raise serializers.ValidationError(
+                {'tags': 'Добавьте хотя бы один тег.'}
+            )
 
         if len(set(tags)) != len(tags):
-            raise serializers.ValidationError({'tags': 'Теги должны быть уникальными.'})
+            raise serializers.ValidationError(
+                {'tags': 'Теги должны быть уникальными.'}
+            )
 
-        ingredients = data.get('recipe_ingredients', [])
+        ingredients = data.get('recipe_ingredients')
         if not ingredients:
-            raise serializers.ValidationError({'ingredients': 'Добавьте хотя бы один ингредиент.'})
+            raise serializers.ValidationError(
+                {'ingredients': 'Добавьте хотя бы один ингредиент.'}
+            )
 
-        ingredient_ids = [ingredient['ingredient'].id for ingredient in ingredients]
+        ingredient_ids = [
+            ingredient['ingredient'].id for ingredient in ingredients
+        ]
         if len(ingredient_ids) != len(set(ingredient_ids)):
-            raise serializers.ValidationError({'ingredients': 'Ингредиенты должны быть уникальными.'})
+            raise serializers.ValidationError(
+                {'ingredients': 'Ингредиенты должны быть уникальными.'}
+            )
 
         return data
 
     def create(self, validated_data):
         """Создаёт новый рецепт."""
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            raise serializers.ValidationError(
+                'Пользователь должен быть аутентифицирован, чтобы создать рецепт.'
+            )
+
+        validated_data.pop('author', None)
+
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('recipe_ingredients')
         with transaction.atomic():
-            recipe = Recipe.objects.create(**validated_data)  # Убрали author=author
-            recipe.author = self.context['request'].user  # Устанавливаем автора
-            recipe.save()
+            recipe = Recipe.objects.create(author=user, **validated_data)
             recipe.tags.set(tags)
-            self._add_ingredients(recipe, ingredients)
+            self.add_tags_and_ingredients_to_recipe(recipe, tags, ingredients)
             return recipe
 
     def update(self, instance, validated_data):
         """Обновляет существующий рецепт."""
         image = validated_data.get('image', instance.image)
         if not image:
-            raise serializers.ValidationError({'image': 'Изображение рецепта обязательно для заполнения.'})
+            raise serializers.ValidationError(
+                {'image': 'Изображение рецепта обязательно для заполнения.'}
+            )
 
         tags = validated_data.pop('tags', None)
         ingredients = validated_data.pop('recipe_ingredients', None)
@@ -251,19 +275,27 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             instance.tags.set(tags)
         if ingredients is not None:
             instance.ingredients.clear()
-            self._add_ingredients(instance, ingredients)
+            self.add_tags_and_ingredients_to_recipe(instance, tags,
+                                                    ingredients)
         return super().update(instance, validated_data)
 
-    def _add_ingredients(self, recipe, ingredients):
-        """Вспомогательный метод для добавления ингредиентов к рецепту."""
-        RecipeIngredient.objects.bulk_create([
+    @staticmethod
+    def add_tags_and_ingredients_to_recipe(recipe, tags, ingredients):
+        """Добавляет теги и ингредиенты к рецепту,
+        сортируя ингредиенты по алфавиту."""
+        sorted_ingredients = sorted(
+            ingredients,
+            key=lambda ingredient: ingredient['ingredient'].name
+        )
+        recipe.tags.set(tags)
+        RecipeIngredient.objects.bulk_create(
             RecipeIngredient(
                 recipe=recipe,
                 ingredient=ingredient['ingredient'],
-                amount=ingredient['amount']
+                amount=ingredient['amount'],
             )
-            for ingredient in ingredients
-        ])
+            for ingredient in sorted_ingredients
+        )
 
     def to_representation(self, instance):
         """Возвращает представление рецепта после создания или обновления."""
@@ -272,7 +304,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_image(self, value):
         """Валидирует поле image."""
         if not value:
-            raise serializers.ValidationError('Изображение рецепта обязательно для заполнения.')
+            raise serializers.ValidationError(
+                'Изображение рецепта обязательно для заполнения.'
+            )
         return value
 
 
@@ -288,7 +322,9 @@ class AuthorRecipeSerializer(serializers.ModelSerializer):
         """Проверяет, что рецепт ещё не добавлен в избранное или корзину."""
         recipe = data['recipe']
         user = self.context['request'].user
-        if self.Meta.model.objects.filter(author=user, recipe=recipe).exists():
+        if self.Meta.model.objects.filter(
+                author=user,
+                recipe=recipe).exists():
             raise serializers.ValidationError(
                 f'Рецепт уже добавлен в {self.add_recipe}.'
             )
@@ -345,18 +381,19 @@ class UserRecipeSerializer(UserSerializer):
         )
 
     def get_recipes(self, obj):
-        """Получает рецепты пользователя с возможностью ограничения по количеству."""
+        """Получает рецепты пользователя с возможностью
+        ограничения по количеству."""
         request = self.context.get('request')
         recipes = obj.recipes.all()
         recipes_limit = request.query_params.get('recipes_limit')
-        if recipes_limit is not None:
-            try:
-                recipes_limit = int(recipes_limit)
-                recipes = recipes[:recipes_limit]
-            except (ValueError, TypeError):
-                pass
+        if recipes_limit and recipes_limit.isdigit():
+            recipes = recipes[:int(recipes_limit)]
 
-        return ShortRecipeSerializer(recipes, many=True, context=self.context).data
+        return ShortRecipeSerializer(
+            recipes,
+            many=True,
+            context=self.context
+        ).data
 
 
 class ShortLinkSerializer(serializers.ModelSerializer):
@@ -366,8 +403,8 @@ class ShortLinkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LinkMapped
-        fields = ('original_url', 'short_link')
-        extra_kwargs = {'original_url': {'write_only': True}}
+        fields = ('short_link',)
+        read_only_fields = ('short_link',)
 
     def get_short_link(self, obj):
         """Генерирует короткую ссылку на основе хэша."""
@@ -385,8 +422,8 @@ class ShortLinkSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        """Возвращает короткую ссылку в ответе."""
-        return {'short-link': self.get_short_link(instance)}
+        """Используем instance, а не validated_data."""
+        return {'short_link': self.get_short_link(instance)}
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -406,7 +443,9 @@ class SubscribeSerializer(serializers.ModelSerializer):
     def validate(self, data):
         """Проверяет, что пользователь не подписывается сам на себя."""
         if data['user'] == data['author']:
-            raise serializers.ValidationError('Нельзя подписаться на самого себя.')
+            raise serializers.ValidationError(
+                'Нельзя подписаться на самого себя.'
+            )
         return data
 
     def to_representation(self, instance):
