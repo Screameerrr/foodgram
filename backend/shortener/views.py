@@ -6,6 +6,7 @@ from shortener.models import LinkMapped
 
 logger = logging.getLogger(__name__)
 
+
 @require_GET
 def load_url(request, url_hash: str) -> JsonResponse:
     """Перенаправление."""
