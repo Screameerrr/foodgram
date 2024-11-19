@@ -3,13 +3,13 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from recipes.constants import (
-    AMOUNT_MIN,
     AMOUNT_MAX,
+    AMOUNT_MIN,
     INGREDIENT_CHAR_MAX,
     INGREDIENT_UNIT_MAX,
+    MIN_TIME,
     RECIPE_CHAR_MAX,
     TAG_CHAR_MAX,
-    MIN_TIME,
 )
 
 User = get_user_model()

@@ -7,9 +7,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib import messages
 
-from .constants import INGREDIENT_MIN_AMOUNT
-from .forms import ImportForm
-from .models import (
+from recipes.constants import INGREDIENT_MIN_AMOUNT
+from recipes.forms import ImportForm
+from recipes.models import (
     FavoriteRecipe,
     Import,
     Ingredient,

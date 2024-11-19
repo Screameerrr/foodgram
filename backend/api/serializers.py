@@ -6,10 +6,10 @@ from rest_framework.reverse import reverse
 from rest_framework.validators import UniqueTogetherValidator
 
 from api.constants import (
+    AMOUNT_MAX,
+    AMOUNT_MIN,
     COOKING_TIME_MAX,
     COOKING_TIME_MIN,
-    AMOUNT_MAX,
-    AMOUNT_MIN
 )
 from recipes.models import (
     FavoriteRecipe,
@@ -248,11 +248,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if not user.is_authenticated:
             raise serializers.ValidationError(
-                'Пользователь должен быть аутентифицирован, чтобы создать рецепт.'
+                'Пользователь должен быть '
+                'аутентифицирован, чтобы создать рецепт.'
             )
-
         validated_data.pop('author', None)
-
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('recipe_ingredients')
         with transaction.atomic():
@@ -403,7 +402,7 @@ class ShortLinkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LinkMapped
-        fields = ('short_link',)  # Убедитесь, что только 'short_link' указано
+        fields = ('short_link',)
 
     def get_short_link(self, obj):
         """Генерирует короткую ссылку на основе хэша."""
@@ -417,7 +416,6 @@ class ShortLinkSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Возвращает только ключ 'short-link'."""
-        # Убедитесь, что возвращается именно 'short-link'
         return {'short-link': self.get_short_link(instance)}
 
 

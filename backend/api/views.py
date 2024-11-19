@@ -5,7 +5,11 @@ from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly
+)
 from rest_framework.response import Response
 from djoser import views as djoser_views
 
@@ -24,7 +28,7 @@ from api.serializers import (
     TagSerializer,
     UserRecipeSerializer,
 )
-from .utils import pdf_shopping_list, ingredients_list
+from api.utils import pdf_shopping_list, ingredients_list
 from recipes.models import (
     FavoriteRecipe,
     Ingredient,
@@ -146,7 +150,6 @@ class UserViewSet(djoser_views.UserViewSet):
         return Response(serializer.data)
 
 
-
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для просмотра тегов."""
 
@@ -172,7 +175,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = FoodgramPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]  # Убедитесь, что оба класса указаны
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def get_serializer_class(self):
         """Получение сериализатора в зависимости от действия."""
@@ -183,7 +186,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Сохранение автора при создании рецепта."""
         serializer.save(author=self.request.user)
-
 
     def handle_action(
             self,

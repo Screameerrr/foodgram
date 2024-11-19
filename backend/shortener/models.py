@@ -4,9 +4,9 @@ from random import choice, randint
 from django.db import models
 
 from shortener.constants import (
-    MIN,
     MAX,
     MAX_HASH,
+    MIN,
     URL
 )
 
