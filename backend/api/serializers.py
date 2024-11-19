@@ -403,8 +403,7 @@ class ShortLinkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LinkMapped
-        fields = ('short_link',)
-        read_only_fields = ('short_link',)
+        fields = ('short_link',)  # Убедитесь, что только 'short_link' указано
 
     def get_short_link(self, obj):
         """Генерирует короткую ссылку на основе хэша."""
@@ -416,14 +415,10 @@ class ShortLinkSerializer(serializers.ModelSerializer):
             )
         )
 
-    def create(self, validated_data):
-        """Создаёт или получает существующую короткую ссылку."""
-        instance, _ = LinkMapped.objects.get_or_create(**validated_data)
-        return instance
-
     def to_representation(self, instance):
-        """Используем instance, а не validated_data."""
-        return {'short_link': self.get_short_link(instance)}
+        """Возвращает только ключ 'short-link'."""
+        # Убедитесь, что возвращается именно 'short-link'
+        return {'short-link': self.get_short_link(instance)}
 
 
 class SubscribeSerializer(serializers.ModelSerializer):

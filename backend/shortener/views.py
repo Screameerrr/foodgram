@@ -6,7 +6,6 @@ from shortener.models import LinkMapped
 
 logger = logging.getLogger(__name__)
 
-
 @require_GET
 def load_url(request, url_hash: str) -> JsonResponse:
     """Перенаправление."""
@@ -15,7 +14,7 @@ def load_url(request, url_hash: str) -> JsonResponse:
         if not link:
             return JsonResponse(
                 {"error": "Ссылка не найдена"},
-                status=200
+                status=404
             )
         original_url = link.original_url
         logger.info(f"Перенаправление с {url_hash} на {original_url}")

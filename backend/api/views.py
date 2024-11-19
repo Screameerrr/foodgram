@@ -32,6 +32,7 @@ from recipes.models import (
     ShoppingCart,
     Tag
 )
+from shortener.models import LinkMapped
 from users.models import Subscriber
 
 User = get_user_model()
@@ -278,13 +279,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         original_url = request.build_absolute_uri(
             reverse('api:recipes-detail', args=[recipe.id])
         )
-        serializer = ShortLinkSerializer(
-            data={'original_url': original_url},
-            context={'request': request}
+        link, created = LinkMapped.objects.get_or_create(
+            original_url=original_url
         )
-        serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
-        return Response(
-            {'short_link': serializer.get_short_link(instance)},
-            status=status.HTTP_200_OK
-        )
+        serializer = ShortLinkSerializer(link, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
