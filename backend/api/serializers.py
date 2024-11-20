@@ -217,18 +217,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'tags': 'Добавьте хотя бы один тег.'}
             )
-
         if len(set(tags)) != len(tags):
             raise serializers.ValidationError(
                 {'tags': 'Теги должны быть уникальными.'}
             )
-
         ingredients = data.get('recipe_ingredients')
         if not ingredients:
             raise serializers.ValidationError(
                 {'ingredients': 'Добавьте хотя бы один ингредиент.'}
             )
-
         ingredient_ids = [
             ingredient['ingredient'].id for ingredient in ingredients
         ]
@@ -236,7 +233,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'ingredients': 'Ингредиенты должны быть уникальными.'}
             )
-
         return data
 
     def create(self, validated_data):
