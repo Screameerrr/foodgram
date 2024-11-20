@@ -7,4 +7,3 @@ HELP_TEXT_USERNAME = (
     'Обязательное поле. Не более {max_length} символов. Только буквы, цифры и '
     '@/./+/-/_ .'.format(max_length=MAX_LENGTH_USERNAME)
 )
-
