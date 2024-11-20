@@ -1,5 +1,5 @@
-from django.db import transaction
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.reverse import reverse
@@ -21,6 +21,7 @@ from recipes.models import (
 )
 from shortener.models import LinkMapped
 from users.models import Subscriber
+
 
 User = get_user_model()
 
@@ -45,11 +46,11 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         """Проверяет, подписан ли текущий пользователь на данного автора."""
         current_user = self.context['request'].user
-        if current_user.is_authenticated and current_user != obj:
-            return Subscriber.objects.filter(
-                user=current_user,
-                author=obj).exists()
-        return False
+        return (
+                current_user.is_authenticated
+                and current_user != obj
+                and current_user.subscriber.filter(author=obj).exists()
+        )
 
 
 class AvatarSerializer(serializers.ModelSerializer):
@@ -171,19 +172,17 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-        if user.is_authenticated:
-            return FavoriteRecipe.objects.filter(
-                author=user,
-                recipe=obj).exists()
-        return False
+        return (
+                user.is_authenticated
+                and user.favorites.filter(recipe=obj).exists()
+        )
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-        if user.is_authenticated:
-            return ShoppingCart.objects.filter(
-                author=user,
-                recipe=obj).exists()
-        return False
+        return (
+                user.is_authenticated
+                and user.shopping_cart.filter(recipe=obj).exists()
+        )
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -246,11 +245,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Создаёт новый рецепт."""
         user = self.context['request'].user
-        if not user.is_authenticated:
-            raise serializers.ValidationError(
-                'Пользователь должен быть '
-                'аутентифицирован, чтобы создать рецепт.'
-            )
         validated_data.pop('author', None)
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('recipe_ingredients')
