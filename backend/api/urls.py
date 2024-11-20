@@ -4,7 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(
-    r'users',
+    'users',
     views.UserViewSet,
     basename='users'
 )
