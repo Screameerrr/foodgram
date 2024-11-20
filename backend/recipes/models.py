@@ -122,7 +122,7 @@ class Recipe(AuthorModel):
     )
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-created_at',)
         default_related_name = 'recipes'
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
@@ -153,7 +153,7 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('ingredient__name',)
         default_related_name = 'recipe_ingredients'
         constraints = [
             models.UniqueConstraint(
@@ -176,9 +176,14 @@ class AuthorRecipeModel(AuthorModel):
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
     )
+    created_at = models.DateTimeField(
+        'Дата добавления',
+        auto_now_add=True,
+    )
 
     class Meta(AuthorModel.Meta):
         abstract = True
+        ordering = ('-created_at',)
 
 
 class FavoriteRecipe(AuthorRecipeModel):
@@ -186,37 +191,35 @@ class FavoriteRecipe(AuthorRecipeModel):
 
     class Meta(AuthorRecipeModel.Meta):
         default_related_name = 'favorites'
-        ordering = ('-id',)
         verbose_name = 'Избранное'
-        verbose_name_plural = verbose_name
+        verbose_name_plural = 'Избранное'
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'recipe'],
-                name='unique recipe favorite',
+                name='unique_recipe_favorite',
             )
         ]
 
     def __str__(self):
-        return f'{self.recipe.name!r} в избранном у {self.author.username!r}'
+        return f"{self.recipe.name!r} в избранном у {self.author.username!r}"
 
 
 class ShoppingCart(AuthorRecipeModel):
     """Корзина."""
 
     class Meta(AuthorRecipeModel.Meta):
-        ordering = ('-id',)
         default_related_name = 'shopping_cart'
         verbose_name = 'Корзина'
-        verbose_name_plural = verbose_name
+        verbose_name_plural = 'Корзина'
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'recipe'],
-                name='unique recipe shopping cart',
+                name='unique_recipe_shopping_cart',
             )
         ]
 
     def __str__(self):
-        return f'{self.recipe.name!r} в корзине у {self.author.username!r}'
+        return f"{self.recipe.name!r} в корзине у {self.author.username!r}"
 
 
 class Import(models.Model):
@@ -232,9 +235,9 @@ class Import(models.Model):
     )
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-date_added',)
         verbose_name = 'Учет импорта CSV'
-        verbose_name_plural = verbose_name
+        verbose_name_plural = 'Учет импорта CSV'
 
     def __str__(self):
         return f'{self.csv_file!r}'
