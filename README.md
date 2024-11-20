@@ -187,15 +187,6 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 ```
 
 
-## Документация API
-
-Подробную документацию по API можно найти [здесь](http://zhrigavno.zapto.org/api/docs/).
-
-## Развернутый проект
-
-Вы можете ознакомиться с развернутой версией проекта по ссылке: [zhrigavno.zapto.org](http://zhrigavno.zapto.org).
-
-
 ## Спецификация API
 
 # API Actions
@@ -255,6 +246,13 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 ---
 
 
+## Документация API
+
+Подробную документацию по API можно найти [здесь](http://zhrigavno.zapto.org/api/docs/).
+
+## Развернутый проект
+
+Вы можете ознакомиться с развернутой версией проекта по ссылке: [zhrigavno.zapto.org](http://zhrigavno.zapto.org).
 
 
 **Автор проекта**: Максим Шевчук
