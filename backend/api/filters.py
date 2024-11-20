@@ -29,8 +29,7 @@ class RecipeFilter(FilterSet):
 
     tags = AllValuesMultipleFilter(field_name='tags__slug')
     is_favorited = BooleanFilter(method='filter_is_favorited')
-    is_in_shopping_cart = BooleanFilter(
-        method='filter_is_in_shopping_cart')
+    is_in_shopping_cart = BooleanFilter(method='filter_is_in_shopping_cart')
 
     class Meta:
         model = Recipe
@@ -41,18 +40,27 @@ class RecipeFilter(FilterSet):
             'is_in_shopping_cart',
         )
 
-    def filter_is_favorited(self, queryset, name, value):
+    def filter_by_relation(self, queryset, relation_name, value):
+        """
+        Универсальный метод фильтрации по отношению.
+        """
         user = self.request.user
         if not user.is_authenticated:
             return queryset
         if value:
-            return queryset.filter(favorites__author=user)
-        return queryset.exclude(favorites__author=user)
+            return queryset.filter(**{f"{relation_name}__author": user})
+        return queryset.exclude(**{f"{relation_name}__author": user})
+
+    def filter_is_favorited(self, queryset, name, value):
+        return self.filter_by_relation(
+            queryset,
+            "favorites",
+            value
+        )
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        user = self.request.user
-        if not user.is_authenticated:
-            return queryset
-        if value:
-            return queryset.filter(shopping_cart__author=user)
-        return queryset.exclude(shopping_cart__author=user)
+        return self.filter_by_relation(
+            queryset,
+            "shopping_cart",
+            value
+        )
