@@ -262,20 +262,20 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 {'image': 'Изображение рецепта обязательно для заполнения.'}
             )
 
-        tags = validated_data.pop('tags', None)
-        ingredients = validated_data.pop('recipe_ingredients', None)
-        if tags is not None:
-            instance.tags.set(tags)
-        if ingredients is not None:
-            instance.ingredients.clear()
-            self.add_tags_and_ingredients_to_recipe(instance, tags,
-                                                    ingredients)
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('recipe_ingredients')
+        instance.tags.set(tags)
+        instance.ingredients.clear()
+        self.add_tags_and_ingredients_to_recipe(instance, tags, ingredients)
         return super().update(instance, validated_data)
 
     @staticmethod
     def add_tags_and_ingredients_to_recipe(recipe, tags, ingredients):
-        """Добавляет теги и ингредиенты к рецепту,
-        сортируя ингредиенты по алфавиту."""
+        """
+        Добавляет теги и ингредиенты к рецепту.
+
+        Сортирует ингредиенты по алфавиту и связывает их с указанным рецептом.
+        """
         sorted_ingredients = sorted(
             ingredients,
             key=lambda ingredient: ingredient['ingredient'].name
@@ -308,7 +308,7 @@ class AuthorRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = None
-        fields = ('id', 'author', 'recipe')
+        fields = ('author', 'recipe')
         read_only_fields = ('id', 'author')
 
     def validate(self, data):
@@ -338,7 +338,7 @@ class FavoriteSerializer(AuthorRecipeSerializer):
 
     class Meta(AuthorRecipeSerializer.Meta):
         model = FavoriteRecipe
-        fields = ('id', 'author', 'recipe')
+        fields = ('author', 'recipe')
 
 
 class ShoppingCartSerializer(AuthorRecipeSerializer):
@@ -348,7 +348,7 @@ class ShoppingCartSerializer(AuthorRecipeSerializer):
 
     class Meta(AuthorRecipeSerializer.Meta):
         model = ShoppingCart
-        fields = ('id', 'author', 'recipe')
+        fields = ('author', 'recipe')
 
 
 class UserRecipeSerializer(UserSerializer):
