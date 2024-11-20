@@ -46,11 +46,10 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         """Проверяет, подписан ли текущий пользователь на данного автора."""
         current_user = self.context['request'].user
-        return (
-                current_user.is_authenticated
-                and current_user != obj
-                and current_user.subscriber.filter(author=obj).exists()
-        )
+        return (current_user
+                .is_authenticated and current_user != obj and current_user
+                .subscriber.filter(author=obj).exists()
+                )
 
 
 class AvatarSerializer(serializers.ModelSerializer):
@@ -172,17 +171,15 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context['request'].user
-        return (
-                user.is_authenticated
-                and user.favorites.filter(recipe=obj).exists()
-        )
+        return (user.is_authenticated and user.favorites.filter(recipe=obj)
+                .exists()
+                )
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context['request'].user
-        return (
-                user.is_authenticated
-                and user.shopping_cart.filter(recipe=obj).exists()
-        )
+        return (user.is_authenticated and user.shopping_cart
+                .filter(recipe=obj).exists()
+                )
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
