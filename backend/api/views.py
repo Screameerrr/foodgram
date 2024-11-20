@@ -1,17 +1,17 @@
-from django.http import FileResponse
-from django.urls import reverse
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.http import FileResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser import views as djoser_views
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
-    IsAuthenticatedOrReadOnly
+    IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
-from djoser import views as djoser_views
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.paginations import FoodgramPagination
@@ -28,13 +28,13 @@ from api.serializers import (
     TagSerializer,
     UserRecipeSerializer,
 )
-from api.utils import pdf_shopping_list, ingredients_list
+from api.utils import ingredients_list, pdf_shopping_list
 from recipes.models import (
     FavoriteRecipe,
     Ingredient,
     Recipe,
     ShoppingCart,
-    Tag
+    Tag,
 )
 from shortener.models import LinkMapped
 from users.models import Subscriber
