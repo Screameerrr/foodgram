@@ -146,3 +146,5 @@ DJOSER = {
         'me': ['rest_framework.permissions.IsAuthenticated'],
     },
 }
+
+FORBIDDEN_USERNAMES = ['me']

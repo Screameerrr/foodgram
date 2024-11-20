@@ -1,19 +1,13 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from users.constants import (
+    HELP_TEXT_USERNAME,
     MAX_LENGTH_FIRST_NAME,
     MAX_LENGTH_LAST_NAME,
+    MAX_LENGTH_USERNAME,
 )
-
-
-def validate_username_not_me(value):
-    """Запрещает использование имени 'me' в качестве имени пользователя."""
-    if value.lower() == 'me':
-        raise ValidationError(
-            "Нельзя использовать 'me' в качестве имени пользователя."
-        )
+from users.validators import validate_username_not_me
 
 
 class User(AbstractUser):
@@ -30,12 +24,9 @@ class User(AbstractUser):
     )
     username = models.CharField(
         verbose_name='имя пользователя',
-        max_length=150,
+        max_length=MAX_LENGTH_USERNAME,
         unique=True,
-        help_text=(
-            'Обязательное поле. Не более 150 символов. Только буквы, цифры и '
-            '@/./+/-/_ .'
-        ),
+        help_text=HELP_TEXT_USERNAME,
         validators=[validate_username_not_me],
         error_messages={
             'unique': (
