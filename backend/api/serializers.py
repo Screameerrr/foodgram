@@ -12,6 +12,7 @@ from api.constants import (
     COOKING_TIME_MIN,
 )
 from recipes.models import (
+    AuthorRecipeModel,
     FavoriteRecipe,
     Ingredient,
     Recipe,
@@ -300,9 +301,9 @@ class AuthorRecipeSerializer(serializers.ModelSerializer):
     """Базовый сериализатор для избранного и корзины."""
 
     class Meta:
-        model = None
+        model = AuthorRecipeModel
         fields = ('author', 'recipe')
-        read_only_fields = ('id', 'author')
+        read_only_fields = ('author',)
 
     def validate(self, data):
         """Проверяет, что рецепт ещё не добавлен в избранное или корзину."""
@@ -331,7 +332,6 @@ class FavoriteSerializer(AuthorRecipeSerializer):
 
     class Meta(AuthorRecipeSerializer.Meta):
         model = FavoriteRecipe
-        fields = ('author', 'recipe')
 
 
 class ShoppingCartSerializer(AuthorRecipeSerializer):
@@ -341,7 +341,6 @@ class ShoppingCartSerializer(AuthorRecipeSerializer):
 
     class Meta(AuthorRecipeSerializer.Meta):
         model = ShoppingCart
-        fields = ('author', 'recipe')
 
 
 class UserRecipeSerializer(UserSerializer):
