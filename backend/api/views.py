@@ -183,7 +183,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeSerializer
         return RecipeCreateSerializer
 
-
     def handle_action(
             self,
             request,
