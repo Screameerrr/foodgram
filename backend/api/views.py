@@ -184,8 +184,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeCreateSerializer
 
     def perform_create(self, serializer):
-        """Сохранение автора при создании рецепта."""
-        serializer.save(author=self.request.user)
+        serializer.save()
 
     def handle_action(
             self,

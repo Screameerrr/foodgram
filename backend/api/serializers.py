@@ -186,6 +186,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания и обновления рецепта."""
 
+    author = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
@@ -209,6 +212,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'name',
             'text',
             'cooking_time',
+            'author',
         )
 
     def validate(self, data):
@@ -237,16 +241,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """Создаёт новый рецепт."""
-        user = self.context['request'].user
+        """Создает новый рецепт."""
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('recipe_ingredients')
         with transaction.atomic():
-            recipe = Recipe(**validated_data)
-            recipe.author = user
-            recipe.save()
+            recipe = Recipe.objects.create(**validated_data)
             self.add_tags_and_ingredients_to_recipe(recipe, tags, ingredients)
-            return recipe
+        return recipe
 
     def update(self, instance, validated_data):
         """Обновляет существующий рецепт."""

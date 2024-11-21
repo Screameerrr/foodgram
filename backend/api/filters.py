@@ -45,11 +45,9 @@ class RecipeFilter(FilterSet):
         Универсальный метод фильтрации по отношению.
         """
         user = self.request.user
-        if not user.is_authenticated:
-            return queryset
-        if value:
+        if user.is_authenticated and value:
             return queryset.filter(**{f"{relation_name}__author": user})
-        return queryset.exclude(**{f"{relation_name}__author": user})
+        return queryset
 
     def filter_is_favorited(self, queryset, name, value):
         return self.filter_by_relation(

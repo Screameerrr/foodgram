@@ -7,7 +7,7 @@ from users.constants import (
     MAX_LENGTH_LAST_NAME,
     MAX_LENGTH_USERNAME,
 )
-from users.validators import validate_username_not_me
+from users.validators import validate_username_forbidden
 
 
 class User(AbstractUser):
@@ -27,7 +27,7 @@ class User(AbstractUser):
         max_length=MAX_LENGTH_USERNAME,
         unique=True,
         help_text=HELP_TEXT_USERNAME,
-        validators=[validate_username_not_me],
+        validators=[validate_username_forbidden],
         error_messages={
             'unique': (
                 "Пользователь с таким именем уже существует."
