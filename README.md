@@ -255,4 +255,5 @@ sudo docker compose -f docker-compose.production.yml exec backend python manage.
 Вы можете ознакомиться с развернутой версией проекта по ссылке: [zhrigavno.zapto.org](http://zhrigavno.zapto.org).
 
 
+
 **Автор проекта**: Максим Шевчук
